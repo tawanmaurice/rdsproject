@@ -110,7 +110,7 @@ resource "aws_security_group" "wp_ec2_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # SSH (for lab only – in real life restrict to your IP)
+  # SSH (lab only – in real life restrict to your IP)
   ingress {
     from_port   = 22
     to_port     = 22
@@ -180,8 +180,8 @@ resource "aws_db_instance" "wp" {
   max_allocated_storage = 100
   storage_type          = "gp3"
 
-  username = "wpadmin"              # for lab use
-  password = "ChangeMeStrong123!"   # for lab – use stronger in real life
+  username = "wpadmin"              # lab only
+  password = "ChangeMeStrong123!"   # lab only
   db_name  = "wordpressdb"
 
   db_subnet_group_name    = aws_db_subnet_group.wp.name
@@ -189,7 +189,7 @@ resource "aws_db_instance" "wp" {
   publicly_accessible     = false
   skip_final_snapshot     = true
   storage_encrypted       = true
-  backup_retention_period = 0        # no backups for lab (0–35 days allowed)
+  backup_retention_period = 0
 
   tags = {
     Name    = "wp-rds-mysql"
@@ -202,7 +202,7 @@ resource "aws_db_instance" "wp" {
 ########################################
 
 resource "aws_instance" "wp_server" {
-  ami           = "ami-0c02fb55956c7d316"  # Amazon Linux 2 in us-east-1; update if region changes
+  ami           = "ami-0c02fb55956c7d316"  # Amazon Linux 2 in us-east-1
   instance_type = "t3.micro"
 
   subnet_id              = aws_subnet.public1a.id
@@ -210,7 +210,8 @@ resource "aws_instance" "wp_server" {
 
   associate_public_ip_address = true
 
-  key_name = "YOUR_KEYPAIR_NAME"  # <<< CHANGE THIS to an existing key pair
+  # Use an EXISTING key pair name from your AWS account
+  key_name = "wp-key"
 
   user_data = <<-EOF
     #!/bin/bash
